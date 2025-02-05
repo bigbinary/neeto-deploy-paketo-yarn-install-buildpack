@@ -122,15 +122,15 @@ func (ip YarnInstallProcess) SetupModules(workingDir, currentModulesLayerPath, n
 			return "", fmt.Errorf("failed to create node_modules directory: %w", err)
 		}
 
-		err = fs.Move(filepath.Join(workingDir, "node_modules"), filepath.Join(nextModulesLayerPath, "node_modules"))
-		if err != nil {
-			return "", fmt.Errorf("failed to move node_modules directory to layer: %w", err)
-		}
+		// err = fs.Move(filepath.Join(workingDir, "node_modules"), filepath.Join(nextModulesLayerPath, "node_modules"))
+		// if err != nil {
+		// 	return "", fmt.Errorf("failed to move node_modules directory to layer: %w", err)
+		// }
 
-		err = os.Symlink(filepath.Join(nextModulesLayerPath, "node_modules"), filepath.Join(workingDir, "node_modules"))
-		if err != nil {
-			return "", fmt.Errorf("failed to symlink node_modules into working directory: %w", err)
-		}
+		// err = os.Symlink(filepath.Join(nextModulesLayerPath, "node_modules"), filepath.Join(workingDir, "node_modules"))
+		// if err != nil {
+		// 	return "", fmt.Errorf("failed to symlink node_modules into working directory: %w", err)
+		// }
 	}
 
 	return nextModulesLayerPath, nil
@@ -181,7 +181,7 @@ func (ip YarnInstallProcess) Execute(workingDir, modulesLayerPath string, launch
 		installArgs = append(installArgs, "--offline")
 	}
 
-	installArgs = append(installArgs, "--modules-folder", filepath.Join(modulesLayerPath, "node_modules"))
+	// installArgs = append(installArgs, "--modules-folder", filepath.Join(modulesLayerPath, "node_modules"))
 	ip.logger.Subprocess("Running 'yarn %s'", strings.Join(installArgs, " "))
 
 	err = ip.executable.Execute(pexec.Execution{
@@ -194,6 +194,14 @@ func (ip YarnInstallProcess) Execute(workingDir, modulesLayerPath string, launch
 	if err != nil {
 		return fmt.Errorf("failed to execute yarn install: %w", err)
 	}
+
+		// Copy node_modules to layers folder for caching purpose
+		err = fs.Copy(filepath.Join(workingDir, "node_modules"), filepath.Join(modulesLayerPath, "node_modules"))
+		if err != nil {
+			fmt.Println(err)
+		}
+		fmt.Println("Copy successful.")
+
 
 	return nil
 }

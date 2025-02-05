@@ -59,6 +59,12 @@ func Build( entryResolver EntryResolver,
 			return packit.BuildResult{}, err
 		}
 
+		// Delete existing node_modules if present
+		err = os.RemoveAll(filepath.Join(projectPath, "node_modules"))
+		if err != nil {
+				fmt.Errorf("failed to remove node_modules symlink: %w", err)
+		}
+
 		globalNpmrcPath, err := configurationManager.DeterminePath("npmrc", context.Platform.Path, ".npmrc")
 		if err != nil {
 			return packit.BuildResult{}, err
@@ -134,10 +140,10 @@ func Build( entryResolver EntryResolver,
 					"cache_sha": sha,
 				}
 
-				err = ensureNodeModulesSymlink(projectPath, layer.Path, tmpDir)
-				if err != nil {
-					return packit.BuildResult{}, err
-				}
+				// err = ensureNodeModulesSymlink(projectPath, layer.Path, tmpDir)
+				// if err != nil {
+				// 	return packit.BuildResult{}, err
+				// }
 
 				path := filepath.Join(layer.Path, "node_modules", ".bin")
 				layer.BuildEnv.Append("PATH", path, string(os.PathListSeparator))
@@ -171,10 +177,10 @@ func Build( entryResolver EntryResolver,
 			} else {
 				logger.Process("Reusing cached layer %s", layer.Path)
 
-				err = ensureNodeModulesSymlink(projectPath, layer.Path, tmpDir)
-				if err != nil {
-					return packit.BuildResult{}, err
-				}
+				// err = ensureNodeModulesSymlink(projectPath, layer.Path, tmpDir)
+				// if err != nil {
+				// 	return packit.BuildResult{}, err
+				// }
 			}
 
 			layer.Build = true
@@ -221,12 +227,12 @@ func Build( entryResolver EntryResolver,
 				logger.Action("Completed in %s", duration.Round(time.Millisecond))
 				logger.Break()
 
-				if !build {
-					err = ensureNodeModulesSymlink(projectPath, layer.Path, tmpDir)
-					if err != nil {
-						return packit.BuildResult{}, err
-					}
-				}
+				// if !build {
+				// 	err = ensureNodeModulesSymlink(projectPath, layer.Path, tmpDir)
+				// 	if err != nil {
+				// 		return packit.BuildResult{}, err
+				// 	}
+				// }
 
 				layer.Metadata = map[string]interface{}{
 					"cache_sha": sha,
@@ -266,12 +272,12 @@ func Build( entryResolver EntryResolver,
 
 			} else {
 				logger.Process("Reusing cached layer %s", layer.Path)
-				if !build {
-					err = ensureNodeModulesSymlink(projectPath, layer.Path, tmpDir)
-					if err != nil {
-						return packit.BuildResult{}, err
-					}
-				}
+				// if !build {
+				// 	err = ensureNodeModulesSymlink(projectPath, layer.Path, tmpDir)
+				// 	if err != nil {
+				// 		return packit.BuildResult{}, err
+				// 	}
+				// }
 			}
 
 			layer.Launch = true
