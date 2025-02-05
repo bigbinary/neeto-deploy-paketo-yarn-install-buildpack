@@ -177,6 +177,10 @@ func Build( entryResolver EntryResolver,
 			} else {
 				logger.Process("Reusing cached layer %s", layer.Path)
 
+				currentModLayer, err = installProcess.SetupModules(projectPath, layer.Path, projectPath)
+				if err != nil {
+					return packit.BuildResult{}, err
+				}
 				// err = ensureNodeModulesSymlink(projectPath, layer.Path, tmpDir)
 				// if err != nil {
 				// 	return packit.BuildResult{}, err
